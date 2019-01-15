@@ -37,6 +37,10 @@ server.get('/api/zoos', (req, res) => {
 });
 
 server.post('/api/zoos', (req, res) => {
+  if (!req.body.name) {
+    res.status(400).json({ message: "A valid name must be provided." });
+  }
+  
   db('zoos')
     .insert(req.body)
     .then(ids => {
