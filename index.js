@@ -10,7 +10,7 @@ const db = knex(knexConfig.development);
 server.use(express.json());
 server.use(helmet());
 
-// endpoints here
+// zoos endpoints
 server.get('/api/zoos/:id', (req, res) => {
   db('zoos')
     .where({ id: req.params.id })
@@ -70,10 +70,6 @@ server.delete('/api/zoos/:id', (req, res) => {
 server.put('/api/zoos/:id', (req, res) => {
   const changes = req.body;
 
-  // if (!changes.length) {
-  //   res.status(400).json({ message: "A valid name must be provided. Please try again." });
-  // };
-
   db('zoos')
     .where({ id: req.params.id })
     .update(changes)
@@ -89,10 +85,88 @@ server.put('/api/zoos/:id', (req, res) => {
         res.status(400).json({ message: "A valid name must be provided. Please try again." });
       } else {
         res.status(500).json(err);
-      }
+      };
     });
 });
 
+// bears endpoints
+server.get('/api/bears/:id', (req, res) => {
+  db('bears')
+    .where({ id: req.params.id })
+    .then(bear => {
+      if(bear.length) {
+        res.status(200).json(bear);
+      } else {
+        res.status(404).json({ message: "The bear ID is not valid." });
+      };
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
+
+server.get('/api/bears', (req, res) => {
+  db('bears')
+    .then(bears => {
+      res.status(200).json(bears);
+    })
+    .catch(err => {
+      res.status(500).json(erro);
+    });
+});
+
+server.post('/api/bears', (req, res) => {
+  db('bears')
+    .insert(req.body)
+      .then(ids => {
+        res.status(201).json(ids);
+      })
+      .catch(err => {
+        if(!req.body.name) {
+          res.status(400).json({ message: "A valid name must be provided." });
+        } else {
+          res.status(500).json(err);
+        };
+      });
+});
+
+server.delete('/api/bears/:id', (req, res) => {
+  db('bears')
+    .where({ id: req.params.id })
+    .del()
+    .then(count => {
+      if(count) {
+        res.status(200).json(count);
+      } else {
+        res.status(404).json({ message: "The bear ID is not valid." });
+      };
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+});
+
+server.put('/api/bears/:id', (req, res) => {
+  const changes = req.body;
+
+  db('bears')
+    .where({ id: req.params.id })
+    .update(changes)
+    .then(count => {
+      if (count) {
+        res.status(200).json(count);
+      } else {
+        res.status(404).json({ message: "The bear ID is not valid." });
+      };
+    })
+    .catch(err => {
+      if (!changes.name) {
+        res.status(400).json({ message: "A valid name must be provided. Please try again." });
+      } else {
+        res.status(500).json(err);
+      };
+    });
+});
 
 const port = 3300;
 server.listen(port, function() {
