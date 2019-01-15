@@ -37,17 +37,17 @@ server.get('/api/zoos', (req, res) => {
 });
 
 server.post('/api/zoos', (req, res) => {
-  if (!req.body.name) {
-    res.status(400).json({ message: "A valid name must be provided." });
-  }
-  
   db('zoos')
     .insert(req.body)
     .then(ids => {
       res.status(201).json(ids);
     })
     .catch(err => {
-      res.status(500).json(err);
+      if(!req.body.name) {
+        res.status(400).json({ message: "A valid name must be provided." });
+      } else {
+        res.status(500).json(err);
+      };
     });
 });
 
@@ -69,6 +69,10 @@ server.delete('/api/zoos/:id', (req, res) => {
 
 server.put('/api/zoos/:id', (req, res) => {
   const changes = req.body;
+
+  if (!changes.length) {
+    res.status(400).json({ message: "A valid name must be provided. Please try again." });
+  };
 
   db('zoos')
     .where({ id: req.params.id })
