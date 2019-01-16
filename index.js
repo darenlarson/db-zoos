@@ -49,7 +49,7 @@ server.post('/api/zoos', (req, res) => {
         res.status(500).json(err);
       };
     });
-});
+}); 
 
 server.delete('/api/zoos/:id', (req, res) => {
   db('zoos')
